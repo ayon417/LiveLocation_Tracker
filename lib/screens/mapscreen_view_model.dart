@@ -1,3 +1,6 @@
+import 'dart:ui';
+
+import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geocoding/geocoding.dart';
@@ -13,8 +16,12 @@ class MapScreenViewModel extends BaseViewModel{
     Ref ref;
     MapScreenViewModel({required this.ref});
     
+    
     final Set<Marker> _markers = {};
     Set<Marker> get markers => _markers;
+
+    final Set<Circle> _circle={};
+    Set<Circle>? get circle=>_circle;
 
    LatLng? _currentPosition;
    LatLng? get currentPosition => _currentPosition;
@@ -56,7 +63,8 @@ class MapScreenViewModel extends BaseViewModel{
    {
     _markers.add(
       Marker(
-      markerId:   MarkerId(locationTitle),
+       
+      markerId: MarkerId(locationTitle),
       position: LatLng(positions.latitude, positions.longitude),
      ) );
      notifyListeners();
@@ -89,16 +97,34 @@ class MapScreenViewModel extends BaseViewModel{
       _currentPosition = LatLng(position.latitude, position.longitude);
        if(_currentPosition!=null)
       {
-        _markers.add(
-         Marker(
-         zIndex: 2,
-         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
-         markerId: const MarkerId("Current Location"),
-         position: LatLng(_currentPosition!.latitude, _currentPosition!.longitude),
-
+          _circle.add(
+          Circle(
+          circleId: CircleId('Your Location'),
+          center: LatLng(currentPosition!.latitude,currentPosition!.longitude), // San Francisco coordinates
+          radius: 60,
+          fillColor: Color.fromARGB(255, 7, 100, 176).withOpacity(1),
+          strokeWidth: 3,
+          strokeColor: Colors.white,
         ),
       );
-       moveCameraToPosition(googleMapController, LatLng(currentPosition!.latitude, currentPosition!.longitude),);
+
+
+
+      //   _markers.add(
+      //    Marker(
+      //    zIndex: 2,
+      //    icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+      //    markerId: const MarkerId("Current Location"),
+      //    position: LatLng(_currentPosition!.latitude, _currentPosition!.longitude),
+
+      //   ),
+      // );
+      if(googleMapController!=null)
+      {
+        moveCameraToPosition(googleMapController, LatLng(currentPosition!.latitude, currentPosition!.longitude),);
+      }
+      
+       
 
     }});
    

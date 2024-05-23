@@ -26,15 +26,18 @@ class _MapScreenState extends ConsumerState<MapScreen> {
 {
   super.initState();
   locationPermission();
+   
 }
 // ignore: non_constant_identifier_names
   late Position position;
   late GoogleMapController googleMapController;
   PanelController panelController=PanelController();
-  late CameraPosition initialCameraPosition=const CameraPosition(target: LatLng(26.516667,88.733333),zoom: 14);
- @override
+ 
+  @override
   Widget build(BuildContext context) {
   MapScreenViewModel mapViewModel=ref.watch(mapScreenViewModelProvider);
+   CameraPosition initialCameraPosition= CameraPosition(target: LatLng(mapViewModel.currentPosition?.latitude?? 26.516667,
+   mapViewModel.currentPosition?.longitude?? 88.733333),zoom: 14);
  // Now, markers list contains only the markers with valid latitude and longitude values.
    return Scaffold(
         extendBodyBehindAppBar: true,
@@ -90,6 +93,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               extendBodyBehindAppBar: true,
               body: GoogleMap(
               initialCameraPosition: initialCameraPosition,
+              circles: mapViewModel.circle!,
               markers:mapViewModel.markers,
               mapType: MapType.normal,
               polylines: {
@@ -102,21 +106,22 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               zoomControlsEnabled: false,
               onMapCreated: (GoogleMapController googleMapController) {
                 setState(() {
-                  this.googleMapController = googleMapController;
+                  this.googleMapController=googleMapController;
+                  ref.read(mapScreenViewModelProvider).getCurrentPosition(googleMapController);
                 });
               }
               ),
-              floatingActionButton: Align(
-                alignment: Alignment.topRight,
-                child: Padding(
-                padding: const EdgeInsets.only(top: 130),
-                  child: FloatingActionButton.extended(
-                    onPressed: (){
-                    mapViewModel.getCurrentPosition(googleMapController);
-                      }, 
-                  icon: const Icon(Icons.location_on), label: const Text("Your Location")),
-                ),
-              ),
+              // floatingActionButton: Align(
+              //   alignment: Alignment.topRight,
+              //   child: Padding(
+              //   padding: const EdgeInsets.only(top: 130),
+              //     child: FloatingActionButton.extended(
+              //       onPressed: (){
+                   
+              //         }, 
+              //     icon: const Icon(Icons.location_on), label: const Text("Your Location")),
+              //   ),
+              // ),
               ),
           ),
         ),
